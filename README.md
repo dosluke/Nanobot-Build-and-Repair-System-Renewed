@@ -2,7 +2,7 @@ This is an updated version of the Nanobot Build and Repair System for Space Engi
 
 ## Current Changes:
 
-+ Planned Efficiency Changes:
+## Planned Efficiency Changes:
 + When a block needs to be placed, for example from a projection, and has not been placed yet, Paste the block in, instead of welding. This should decrease cpu cycles incurred by the mod separating placing and welding.
 + Explore a sleep mode, if it doesnt already exist, where the block does almost nothing when no players are around, or are disconnected.
 + Reduce code complexity to identify more ways to save server resources.
