@@ -9,6 +9,8 @@ This is an updated version of the Nanobot Build and Repair System for Space Engi
 
 
 ## Potential Gameplay Changes:
++ New models/Textures.
++ More Conveyer connections.
 + Reducing the number of textures and Removing the colored status textures will reduce code, complexity, and resources from a feature that doesnt seem to be used much.
 + Increased power usage. The original mod uses a very small amount of energy, for a block which does quite a lot.
 + Adjustable power usage by the player, to improve speed, this replaces the effect of using multiple BaRs, increasing performance by using less blocks for the same effect. Only one block would be performing checks, etc.
