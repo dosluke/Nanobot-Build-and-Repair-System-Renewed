@@ -89,15 +89,15 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
       {
          DisableLocalization = false;
          LogLevel = Logging.Level.Error; //Default
-         MaxBackgroundTasks = NanobotBuildAndRepairSystemMod.MaxBackgroundTasks_Default;
+         MaxBackgroundTasks = BARMod.MaxBackgroundTasks_Default;
          TargetsUpdateInterval = TimeSpan.FromSeconds(10);
          SourcesUpdateInterval = TimeSpan.FromSeconds(60);
          FriendlyDamageTimeout = TimeSpan.FromSeconds(60);
          FriendlyDamageCleanup = TimeSpan.FromSeconds(10);
-         Range = NanobotBuildAndRepairSystemBlock.WELDER_RANGE_DEFAULT_IN_M;
-         MaximumOffset = NanobotBuildAndRepairSystemBlock.WELDER_OFFSET_MAX_DEFAULT_IN_M;
-         MaximumRequiredElectricPowerStandby = NanobotBuildAndRepairSystemBlock.WELDER_REQUIRED_ELECTRIC_POWER_STANDBY_DEFAULT;
-         MaximumRequiredElectricPowerTransport = NanobotBuildAndRepairSystemBlock.WELDER_REQUIRED_ELECTRIC_POWER_TRANSPORT_DEFAULT;
+         Range = BARBlock.WELDER_RANGE_DEFAULT_IN_M;
+         MaximumOffset = BARBlock.WELDER_OFFSET_MAX_DEFAULT_IN_M;
+         MaximumRequiredElectricPowerStandby = BARBlock.WELDER_REQUIRED_ELECTRIC_POWER_STANDBY_DEFAULT;
+         MaximumRequiredElectricPowerTransport = BARBlock.WELDER_REQUIRED_ELECTRIC_POWER_TRANSPORT_DEFAULT;
          Welder = new SyncModSettingsWelder();
       }
 
@@ -126,31 +126,31 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
             if (settings != null)
             {
                var adjusted = AdjustSettings(settings);
-               if (settings.MaxBackgroundTasks > NanobotBuildAndRepairSystemMod.MaxBackgroundTasks_Max)
+               if (settings.MaxBackgroundTasks > BARMod.MaxBackgroundTasks_Max)
                {
-                  settings.MaxBackgroundTasks = NanobotBuildAndRepairSystemMod.MaxBackgroundTasks_Max;
+                  settings.MaxBackgroundTasks = BARMod.MaxBackgroundTasks_Max;
                   adjusted = true;
                }
-               else if (settings.MaxBackgroundTasks < NanobotBuildAndRepairSystemMod.MaxBackgroundTasks_Min)
+               else if (settings.MaxBackgroundTasks < BARMod.MaxBackgroundTasks_Min)
                {
-                  settings.MaxBackgroundTasks = NanobotBuildAndRepairSystemMod.MaxBackgroundTasks_Min;
-                  adjusted = true;
-               }
-
-               if (settings.Range > NanobotBuildAndRepairSystemBlock.WELDER_RANGE_MAX_IN_M)
-               {
-                  settings.Range = NanobotBuildAndRepairSystemBlock.WELDER_RANGE_MAX_IN_M;
-                  adjusted = true;
-               }
-               else if (settings.Range < NanobotBuildAndRepairSystemBlock.WELDER_RANGE_MIN_IN_M)
-               {
-                  settings.Range = NanobotBuildAndRepairSystemBlock.WELDER_RANGE_MIN_IN_M;
+                  settings.MaxBackgroundTasks = BARMod.MaxBackgroundTasks_Min;
                   adjusted = true;
                }
 
-               if (settings.MaximumOffset > NanobotBuildAndRepairSystemBlock.WELDER_OFFSET_MAX_IN_M)
+               if (settings.Range > BARBlock.WELDER_RANGE_MAX_IN_M)
                {
-                  settings.MaximumOffset = NanobotBuildAndRepairSystemBlock.WELDER_OFFSET_MAX_IN_M;
+                  settings.Range = BARBlock.WELDER_RANGE_MAX_IN_M;
+                  adjusted = true;
+               }
+               else if (settings.Range < BARBlock.WELDER_RANGE_MIN_IN_M)
+               {
+                  settings.Range = BARBlock.WELDER_RANGE_MIN_IN_M;
+                  adjusted = true;
+               }
+
+               if (settings.MaximumOffset > BARBlock.WELDER_OFFSET_MAX_IN_M)
+               {
+                  settings.MaximumOffset = BARBlock.WELDER_OFFSET_MAX_IN_M;
                   adjusted = true;
                }
                else if (settings.MaximumOffset < 0)
@@ -159,25 +159,25 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   adjusted = true;
                }
 
-               if (settings.Welder.WeldingMultiplier < NanobotBuildAndRepairSystemBlock.WELDING_GRINDING_MULTIPLIER_MIN)
+               if (settings.Welder.WeldingMultiplier < BARBlock.WELDING_GRINDING_MULTIPLIER_MIN)
                {
-                  settings.Welder.WeldingMultiplier = NanobotBuildAndRepairSystemBlock.WELDING_GRINDING_MULTIPLIER_MIN;
+                  settings.Welder.WeldingMultiplier = BARBlock.WELDING_GRINDING_MULTIPLIER_MIN;
                   adjusted = true;
                }
-               else if (settings.Welder.WeldingMultiplier >= NanobotBuildAndRepairSystemBlock.WELDING_GRINDING_MULTIPLIER_MAX)
+               else if (settings.Welder.WeldingMultiplier >= BARBlock.WELDING_GRINDING_MULTIPLIER_MAX)
                {
-                  settings.Welder.WeldingMultiplier = NanobotBuildAndRepairSystemBlock.WELDING_GRINDING_MULTIPLIER_MAX;
+                  settings.Welder.WeldingMultiplier = BARBlock.WELDING_GRINDING_MULTIPLIER_MAX;
                   adjusted = true;
                }
 
-               if (settings.Welder.GrindingMultiplier < NanobotBuildAndRepairSystemBlock.WELDING_GRINDING_MULTIPLIER_MIN)
+               if (settings.Welder.GrindingMultiplier < BARBlock.WELDING_GRINDING_MULTIPLIER_MIN)
                {
-                  settings.Welder.GrindingMultiplier = NanobotBuildAndRepairSystemBlock.WELDING_GRINDING_MULTIPLIER_MIN;
+                  settings.Welder.GrindingMultiplier = BARBlock.WELDING_GRINDING_MULTIPLIER_MIN;
                   adjusted = true;
                }
-               else if (settings.Welder.GrindingMultiplier >= NanobotBuildAndRepairSystemBlock.WELDING_GRINDING_MULTIPLIER_MAX)
+               else if (settings.Welder.GrindingMultiplier >= BARBlock.WELDING_GRINDING_MULTIPLIER_MAX)
                {
-                  settings.Welder.GrindingMultiplier = NanobotBuildAndRepairSystemBlock.WELDING_GRINDING_MULTIPLIER_MAX;
+                  settings.Welder.GrindingMultiplier = BARBlock.WELDING_GRINDING_MULTIPLIER_MAX;
                   adjusted = true;
                }
 
@@ -334,8 +334,8 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
 
       public SyncModSettingsWelder()
       {
-         MaximumRequiredElectricPowerWelding = NanobotBuildAndRepairSystemBlock.WELDER_REQUIRED_ELECTRIC_POWER_WELDING_DEFAULT;
-         MaximumRequiredElectricPowerGrinding = NanobotBuildAndRepairSystemBlock.WELDER_REQUIRED_ELECTRIC_POWER_GRINDING_DEFAULT;
+         MaximumRequiredElectricPowerWelding = BARBlock.WELDER_REQUIRED_ELECTRIC_POWER_WELDING_DEFAULT;
+         MaximumRequiredElectricPowerGrinding = BARBlock.WELDER_REQUIRED_ELECTRIC_POWER_GRINDING_DEFAULT;
 
          WeldingMultiplier = 1f;
          GrindingMultiplier = 1f;
@@ -378,7 +378,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
          CollectIfIdleDefault = false;
 
          SoundVolumeFixed = false;
-         SoundVolumeDefault = NanobotBuildAndRepairSystemBlock.WELDER_SOUND_VOLUME / 2;
+         SoundVolumeDefault = BARBlock.WELDER_SOUND_VOLUME / 2;
 
          ScriptControllFixed = false;
          AllowedEffects = VisualAndSoundEffects.WeldingVisualEffect | VisualAndSoundEffects.WeldingSoundEffect
@@ -894,7 +894,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
 
       }
 
-      public SyncBlockSettings(NanobotBuildAndRepairSystemBlock system)
+      public SyncBlockSettings(BARBlock system)
       {
          _WeldPriority = string.Empty;
          _GrindPriority = string.Empty;
@@ -938,7 +938,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
          Changed = (Changed & ~2u);
       }
 
-      public static SyncBlockSettings Load(NanobotBuildAndRepairSystemBlock system, Guid guid, NanobotBuildAndRepairSystemBlockPriorityHandling blockWeldPriority, NanobotBuildAndRepairSystemBlockPriorityHandling blockGrindPriority, NanobotBuildAndRepairSystemComponentPriorityHandling componentCollectPriority)
+      public static SyncBlockSettings Load(BARBlock system, Guid guid, NanobotBuildAndRepairSystemBlockPriorityHandling blockWeldPriority, NanobotBuildAndRepairSystemBlockPriorityHandling blockGrindPriority, NanobotBuildAndRepairSystemComponentPriorityHandling componentCollectPriority)
       {
          var storage = system.Entity.Storage;
          string data;
@@ -1051,18 +1051,18 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
          }
       }
 
-      public void CheckLimits(NanobotBuildAndRepairSystemBlock system, bool init)
+      public void CheckLimits(BARBlock system, bool init)
       {
          var scale = (system != null && system.Welder != null ? (system.Welder.BlockDefinition.SubtypeName.Contains("Large") ? 1f : 3f) : 1f);
 
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.AreaOffsetFixed || init)
+         if (BARMod.Settings.Welder.AreaOffsetFixed || init)
          {
             MaximumOffset = 0;
             AreaOffset = new Vector3(0, 0, 0);
          }
          else
          {
-            MaximumOffset = (int)Math.Ceiling(NanobotBuildAndRepairSystemMod.Settings.MaximumOffset / scale);
+            MaximumOffset = (int)Math.Ceiling(BARMod.Settings.MaximumOffset / scale);
             if (AreaOffset.X > MaximumOffset || init) AreaOffset = new Vector3(init ? 0 : (float)MaximumOffset, AreaOffset.Y, AreaOffset.Z);
             else if (AreaOffset.X < -MaximumOffset || init) AreaOffset = new Vector3(init ? 0 : (float)-MaximumOffset, AreaOffset.Y, AreaOffset.Z);
 
@@ -1073,8 +1073,8 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
             else if (AreaOffset.Z < -MaximumOffset || init) AreaOffset = new Vector3(AreaOffset.X, AreaOffset.Y, init ? 0 : (float)-MaximumOffset);
          }
 
-         MaximumRange = (int)Math.Ceiling(NanobotBuildAndRepairSystemMod.Settings.Range*2 / scale);
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.AreaSizeFixed || init)
+         MaximumRange = (int)Math.Ceiling(BARMod.Settings.Range*2 / scale);
+         if (BARMod.Settings.Welder.AreaSizeFixed || init)
          {
             AreaSize = new Vector3(MaximumRange, MaximumRange, MaximumRange);
          } else {
@@ -1083,80 +1083,80 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
             if (AreaSize.Z > MaximumRange || init) AreaSize = new Vector3(AreaSize.X, AreaSize.Y, MaximumRange);
          }
 
-         MaximumRequiredElectricPowerStandby = NanobotBuildAndRepairSystemMod.Settings.MaximumRequiredElectricPowerStandby / scale;
-         MaximumRequiredElectricPowerTransport = NanobotBuildAndRepairSystemMod.Settings.MaximumRequiredElectricPowerTransport / scale;
-         MaximumRequiredElectricPowerWelding = NanobotBuildAndRepairSystemMod.Settings.Welder.MaximumRequiredElectricPowerWelding / scale;
-         MaximumRequiredElectricPowerGrinding = NanobotBuildAndRepairSystemMod.Settings.Welder.MaximumRequiredElectricPowerGrinding / scale;
+         MaximumRequiredElectricPowerStandby = BARMod.Settings.MaximumRequiredElectricPowerStandby / scale;
+         MaximumRequiredElectricPowerTransport = BARMod.Settings.MaximumRequiredElectricPowerTransport / scale;
+         MaximumRequiredElectricPowerWelding = BARMod.Settings.Welder.MaximumRequiredElectricPowerWelding / scale;
+         MaximumRequiredElectricPowerGrinding = BARMod.Settings.Welder.MaximumRequiredElectricPowerGrinding / scale;
 
-         var maxMultiplier = Math.Max(NanobotBuildAndRepairSystemMod.Settings.Welder.WeldingMultiplier, NanobotBuildAndRepairSystemMod.Settings.Welder.GrindingMultiplier);
-         TransportSpeed = maxMultiplier * NanobotBuildAndRepairSystemBlock.WELDER_TRANSPORTSPEED_METER_PER_SECOND_DEFAULT * Math.Min(NanobotBuildAndRepairSystemMod.Settings.Range / NanobotBuildAndRepairSystemBlock.WELDER_RANGE_DEFAULT_IN_M, 4.0f);
+         var maxMultiplier = Math.Max(BARMod.Settings.Welder.WeldingMultiplier, BARMod.Settings.Welder.GrindingMultiplier);
+         TransportSpeed = maxMultiplier * BARBlock.WELDER_TRANSPORTSPEED_METER_PER_SECOND_DEFAULT * Math.Min(BARMod.Settings.Range / BARBlock.WELDER_RANGE_DEFAULT_IN_M, 4.0f);
 
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowBuildFixed || init)
+         if (BARMod.Settings.Welder.AllowBuildFixed || init)
          {
-            Flags = (Flags & ~Settings.AllowBuild) | (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowBuildDefault ? Settings.AllowBuild : 0);
+            Flags = (Flags & ~Settings.AllowBuild) | (BARMod.Settings.Welder.AllowBuildDefault ? Settings.AllowBuild : 0);
          }
 
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.UseIgnoreColorFixed || init)
+         if (BARMod.Settings.Welder.UseIgnoreColorFixed || init)
          {
-            Flags = (Flags & ~Settings.UseIgnoreColor) | (NanobotBuildAndRepairSystemMod.Settings.Welder.UseIgnoreColorDefault ? Settings.UseIgnoreColor : 0);
-            if (NanobotBuildAndRepairSystemMod.Settings.Welder.IgnoreColorDefault != null && NanobotBuildAndRepairSystemMod.Settings.Welder.IgnoreColorDefault.Length >= 3)
+            Flags = (Flags & ~Settings.UseIgnoreColor) | (BARMod.Settings.Welder.UseIgnoreColorDefault ? Settings.UseIgnoreColor : 0);
+            if (BARMod.Settings.Welder.IgnoreColorDefault != null && BARMod.Settings.Welder.IgnoreColorDefault.Length >= 3)
             {
-               IgnoreColor = new Vector3D(NanobotBuildAndRepairSystemMod.Settings.Welder.IgnoreColorDefault[0] / 360f,
-                                         ((float)Math.Round(NanobotBuildAndRepairSystemMod.Settings.Welder.IgnoreColorDefault[1], 1, MidpointRounding.AwayFromZero) / 100f) - NanobotBuildAndRepairSystemTerminal.SATURATION_DELTA,
-                                         ((float)Math.Round(NanobotBuildAndRepairSystemMod.Settings.Welder.IgnoreColorDefault[2], 1, MidpointRounding.AwayFromZero) / 100f) - NanobotBuildAndRepairSystemTerminal.VALUE_DELTA + NanobotBuildAndRepairSystemTerminal.VALUE_COLORIZE_DELTA);
+               IgnoreColor = new Vector3D(BARMod.Settings.Welder.IgnoreColorDefault[0] / 360f,
+                                         ((float)Math.Round(BARMod.Settings.Welder.IgnoreColorDefault[1], 1, MidpointRounding.AwayFromZero) / 100f) - BARTerminal.SATURATION_DELTA,
+                                         ((float)Math.Round(BARMod.Settings.Welder.IgnoreColorDefault[2], 1, MidpointRounding.AwayFromZero) / 100f) - BARTerminal.VALUE_DELTA + BARTerminal.VALUE_COLORIZE_DELTA);
             }
          }
 
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindColorFixed || init)
+         if (BARMod.Settings.Welder.UseGrindColorFixed || init)
          {
-            Flags = (Flags & ~Settings.UseGrindColor) | (NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindColorDefault ? Settings.UseGrindColor : 0);
-            if (NanobotBuildAndRepairSystemMod.Settings.Welder.GrindColorDefault != null && NanobotBuildAndRepairSystemMod.Settings.Welder.GrindColorDefault.Length >= 3)
+            Flags = (Flags & ~Settings.UseGrindColor) | (BARMod.Settings.Welder.UseGrindColorDefault ? Settings.UseGrindColor : 0);
+            if (BARMod.Settings.Welder.GrindColorDefault != null && BARMod.Settings.Welder.GrindColorDefault.Length >= 3)
             {
-               GrindColor = new Vector3D(NanobotBuildAndRepairSystemMod.Settings.Welder.GrindColorDefault[0] / 360f,
-                                         ((float)Math.Round(NanobotBuildAndRepairSystemMod.Settings.Welder.GrindColorDefault[1], 1, MidpointRounding.AwayFromZero) / 100f) - NanobotBuildAndRepairSystemTerminal.SATURATION_DELTA,
-                                         ((float)Math.Round(NanobotBuildAndRepairSystemMod.Settings.Welder.GrindColorDefault[2], 1, MidpointRounding.AwayFromZero) / 100f) - NanobotBuildAndRepairSystemTerminal.VALUE_DELTA + NanobotBuildAndRepairSystemTerminal.VALUE_COLORIZE_DELTA);
+               GrindColor = new Vector3D(BARMod.Settings.Welder.GrindColorDefault[0] / 360f,
+                                         ((float)Math.Round(BARMod.Settings.Welder.GrindColorDefault[1], 1, MidpointRounding.AwayFromZero) / 100f) - BARTerminal.SATURATION_DELTA,
+                                         ((float)Math.Round(BARMod.Settings.Welder.GrindColorDefault[2], 1, MidpointRounding.AwayFromZero) / 100f) - BARTerminal.VALUE_DELTA + BARTerminal.VALUE_COLORIZE_DELTA);
             }
          }
 
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || init)
+         if (BARMod.Settings.Welder.UseGrindJanitorFixed || init)
          {
-            UseGrindJanitorOn = NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorDefault;
-            GrindJanitorOptions = NanobotBuildAndRepairSystemMod.Settings.Welder.GrindJanitorOptionsDefault;
+            UseGrindJanitorOn = BARMod.Settings.Welder.UseGrindJanitorDefault;
+            GrindJanitorOptions = BARMod.Settings.Welder.GrindJanitorOptionsDefault;
          }
 
-         UseGrindJanitorOn &= NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedGrindJanitorRelations;
+         UseGrindJanitorOn &= BARMod.Settings.Welder.AllowedGrindJanitorRelations;
 
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.ShowAreaFixed || init) Flags = (Flags & ~Settings.ShowArea);
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.PushIngotOreImmediatelyFixed || init) Flags = (Flags & ~Settings.PushIngotOreImmediately) | (NanobotBuildAndRepairSystemMod.Settings.Welder.PushIngotOreImmediatelyDefault ? Settings.PushIngotOreImmediately : 0);
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.PushComponentImmediatelyFixed || init) Flags = (Flags & ~Settings.PushComponentImmediately) | (NanobotBuildAndRepairSystemMod.Settings.Welder.PushComponentImmediatelyDefault ? Settings.PushComponentImmediately : 0);
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.PushItemsImmediatelyFixed || init) Flags = (Flags & ~Settings.PushItemsImmediately) | (NanobotBuildAndRepairSystemMod.Settings.Welder.PushItemsImmediatelyDefault ? Settings.PushItemsImmediately : 0);
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.CollectIfIdleFixed || init) Flags = (Flags & ~Settings.ComponentCollectIfIdle) | (NanobotBuildAndRepairSystemMod.Settings.Welder.CollectIfIdleDefault ? Settings.ComponentCollectIfIdle : 0);
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.SoundVolumeFixed || init) SoundVolume = NanobotBuildAndRepairSystemMod.Settings.Welder.SoundVolumeDefault;
-         if (NanobotBuildAndRepairSystemMod.Settings.Welder.ScriptControllFixed || init) Flags = (Flags & ~Settings.ScriptControlled);
-         if ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedSearchModes & SearchMode) == 0 || init)
+         if (BARMod.Settings.Welder.ShowAreaFixed || init) Flags = (Flags & ~Settings.ShowArea);
+         if (BARMod.Settings.Welder.PushIngotOreImmediatelyFixed || init) Flags = (Flags & ~Settings.PushIngotOreImmediately) | (BARMod.Settings.Welder.PushIngotOreImmediatelyDefault ? Settings.PushIngotOreImmediately : 0);
+         if (BARMod.Settings.Welder.PushComponentImmediatelyFixed || init) Flags = (Flags & ~Settings.PushComponentImmediately) | (BARMod.Settings.Welder.PushComponentImmediatelyDefault ? Settings.PushComponentImmediately : 0);
+         if (BARMod.Settings.Welder.PushItemsImmediatelyFixed || init) Flags = (Flags & ~Settings.PushItemsImmediately) | (BARMod.Settings.Welder.PushItemsImmediatelyDefault ? Settings.PushItemsImmediately : 0);
+         if (BARMod.Settings.Welder.CollectIfIdleFixed || init) Flags = (Flags & ~Settings.ComponentCollectIfIdle) | (BARMod.Settings.Welder.CollectIfIdleDefault ? Settings.ComponentCollectIfIdle : 0);
+         if (BARMod.Settings.Welder.SoundVolumeFixed || init) SoundVolume = BARMod.Settings.Welder.SoundVolumeDefault;
+         if (BARMod.Settings.Welder.ScriptControllFixed || init) Flags = (Flags & ~Settings.ScriptControlled);
+         if ((BARMod.Settings.Welder.AllowedSearchModes & SearchMode) == 0 || init)
          {
-            if ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedSearchModes & NanobotBuildAndRepairSystemMod.Settings.Welder.SearchModeDefault) != 0)
+            if ((BARMod.Settings.Welder.AllowedSearchModes & BARMod.Settings.Welder.SearchModeDefault) != 0)
             {
-               SearchMode = NanobotBuildAndRepairSystemMod.Settings.Welder.SearchModeDefault;
-            }
-            else
-            {
-               if ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedSearchModes & SearchModes.Grids) != 0) SearchMode = SearchModes.Grids;
-               else if ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedSearchModes & SearchModes.BoundingBox) != 0) SearchMode = SearchModes.BoundingBox;
-            }
-         }
-
-         if ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes & WorkMode) == 0 || init)
-         {
-            if ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes & NanobotBuildAndRepairSystemMod.Settings.Welder.WorkModeDefault) != 0)
-            {
-               WorkMode = NanobotBuildAndRepairSystemMod.Settings.Welder.WorkModeDefault;
+               SearchMode = BARMod.Settings.Welder.SearchModeDefault;
             }
             else
             {
-               if ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes & WorkModes.WeldBeforeGrind) != 0) WorkMode = WorkModes.WeldBeforeGrind;
-               else if ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes & WorkModes.GrindBeforeWeld) != 0) WorkMode = WorkModes.GrindBeforeWeld;
-               else if ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes & WorkModes.GrindIfWeldGetStuck) != 0) WorkMode = WorkModes.GrindIfWeldGetStuck;
+               if ((BARMod.Settings.Welder.AllowedSearchModes & SearchModes.Grids) != 0) SearchMode = SearchModes.Grids;
+               else if ((BARMod.Settings.Welder.AllowedSearchModes & SearchModes.BoundingBox) != 0) SearchMode = SearchModes.BoundingBox;
+            }
+         }
+
+         if ((BARMod.Settings.Welder.AllowedWorkModes & WorkMode) == 0 || init)
+         {
+            if ((BARMod.Settings.Welder.AllowedWorkModes & BARMod.Settings.Welder.WorkModeDefault) != 0)
+            {
+               WorkMode = BARMod.Settings.Welder.WorkModeDefault;
+            }
+            else
+            {
+               if ((BARMod.Settings.Welder.AllowedWorkModes & WorkModes.WeldBeforeGrind) != 0) WorkMode = WorkModes.WeldBeforeGrind;
+               else if ((BARMod.Settings.Welder.AllowedWorkModes & WorkModes.GrindBeforeWeld) != 0) WorkMode = WorkModes.GrindBeforeWeld;
+               else if ((BARMod.Settings.Welder.AllowedWorkModes & WorkModes.GrindIfWeldGetStuck) != 0) WorkMode = WorkModes.GrindIfWeldGetStuck;
             }
          }
       }

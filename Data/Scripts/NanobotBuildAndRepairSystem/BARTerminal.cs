@@ -89,7 +89,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
       TransportVisualEffect = 0x00010000,
    }
 
-   public static class NanobotBuildAndRepairSystemTerminal
+   public static class BARTerminal
    {
       public const float SATURATION_DELTA = 0.8f;
       public const float VALUE_DELTA = 0.55f;
@@ -129,9 +129,9 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
       /// </summary>
       /// <param name="block"></param>
       /// <returns></returns>
-      private static NanobotBuildAndRepairSystemBlock GetSystem(IMyTerminalBlock block)
+      private static BARBlock GetSystem(IMyTerminalBlock block)
       {
-         if (block != null && block.GameLogic != null) return block.GameLogic.GetAs<NanobotBuildAndRepairSystemBlock>();
+         if (block != null && block.GameLogic != null) return block.GameLogic.GetAs<BARBlock>();
          return null;
       }
 
@@ -162,14 +162,14 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                IMyTerminalControlOnOffSwitch onoffSwitch;
                IMyTerminalControlButton button;
 
-               var weldingAllowed  = (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes & (WorkModes.WeldBeforeGrind | WorkModes.GrindBeforeWeld | WorkModes.GrindIfWeldGetStuck | WorkModes.WeldOnly)) != 0;
-               var grindingAllowed = (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes & (WorkModes.WeldBeforeGrind | WorkModes.GrindBeforeWeld | WorkModes.GrindIfWeldGetStuck | WorkModes.GrindOnly)) != 0;
-               var janitorAllowed             = grindingAllowed && (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedGrindJanitorRelations != 0);
-               var janitorAllowedNoOwnership  = janitorAllowed && ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedGrindJanitorRelations & AutoGrindRelation.NoOwnership) != 0);
-               var janitorAllowedOwner        = janitorAllowed && ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedGrindJanitorRelations & AutoGrindRelation.Owner) != 0);
-               var janitorAllowedFactionShare = janitorAllowed && ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedGrindJanitorRelations & AutoGrindRelation.FactionShare) != 0);
-               var janitorAllowedNeutral      = janitorAllowed && ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedGrindJanitorRelations & AutoGrindRelation.Neutral) != 0);
-               var janitorAllowedEnemies      = janitorAllowed && ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedGrindJanitorRelations & AutoGrindRelation.Enemies) != 0);
+               var weldingAllowed  = (BARMod.Settings.Welder.AllowedWorkModes & (WorkModes.WeldBeforeGrind | WorkModes.GrindBeforeWeld | WorkModes.GrindIfWeldGetStuck | WorkModes.WeldOnly)) != 0;
+               var grindingAllowed = (BARMod.Settings.Welder.AllowedWorkModes & (WorkModes.WeldBeforeGrind | WorkModes.GrindBeforeWeld | WorkModes.GrindIfWeldGetStuck | WorkModes.GrindOnly)) != 0;
+               var janitorAllowed             = grindingAllowed && (BARMod.Settings.Welder.AllowedGrindJanitorRelations != 0);
+               var janitorAllowedNoOwnership  = janitorAllowed && ((BARMod.Settings.Welder.AllowedGrindJanitorRelations & AutoGrindRelation.NoOwnership) != 0);
+               var janitorAllowedOwner        = janitorAllowed && ((BARMod.Settings.Welder.AllowedGrindJanitorRelations & AutoGrindRelation.Owner) != 0);
+               var janitorAllowedFactionShare = janitorAllowed && ((BARMod.Settings.Welder.AllowedGrindJanitorRelations & AutoGrindRelation.FactionShare) != 0);
+               var janitorAllowedNeutral      = janitorAllowed && ((BARMod.Settings.Welder.AllowedGrindJanitorRelations & AutoGrindRelation.Neutral) != 0);
+               var janitorAllowedEnemies      = janitorAllowed && ((BARMod.Settings.Welder.AllowedGrindJanitorRelations & AutoGrindRelation.Enemies) != 0);
 
                Func<IMyTerminalBlock, bool> isBaRSystem = (block) =>
                {
@@ -193,7 +193,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                };
                Func<IMyTerminalBlock, bool> isChangeCollectPriorityPossible = (block) => {
                   var system = GetSystem(block);
-                  return system != null && system.ComponentCollectPriority != null && system.ComponentCollectPriority.Selected != null && system.Settings.SearchMode == SearchModes.BoundingBox && !NanobotBuildAndRepairSystemMod.Settings.Welder.CollectPriorityFixed;
+                  return system != null && system.ComponentCollectPriority != null && system.ComponentCollectPriority.Selected != null && system.Settings.SearchMode == SearchModes.BoundingBox && !BARMod.Settings.Welder.CollectPriorityFixed;
                };
 
                List<IMyTerminalControl> controls;
@@ -209,7 +209,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                CustomControls.Add(label);
                {
                   // --- Select search mode
-                  var onlyOneAllowed = (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedSearchModes & (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedSearchModes - 1)) == 0;
+                  var onlyOneAllowed = (BARMod.Settings.Welder.AllowedSearchModes & (BARMod.Settings.Welder.AllowedSearchModes - 1)) == 0;
                   comboBox = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlCombobox, IMyShipWelder>("Mode");
                   comboBox.Title = Texts.SearchMode;
                   comboBox.Tooltip = Texts.SearchMode_Tooltip;
@@ -217,9 +217,9 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
 
                   comboBox.ComboBoxContent = (list) =>
                   {
-                     if (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedSearchModes.HasFlag(SearchModes.Grids))
+                     if (BARMod.Settings.Welder.AllowedSearchModes.HasFlag(SearchModes.Grids))
                         list.Add(new MyTerminalControlComboBoxItem() { Key = (long)SearchModes.Grids, Value = Texts.SearchMode_Walk });
-                     if (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedSearchModes.HasFlag(SearchModes.BoundingBox))
+                     if (BARMod.Settings.Welder.AllowedSearchModes.HasFlag(SearchModes.BoundingBox))
                         list.Add(new MyTerminalControlComboBoxItem() { Key = (long)SearchModes.BoundingBox, Value = Texts.SearchMode_Fly });
                   };
                   comboBox.Getter = (block) =>
@@ -233,7 +233,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      var system = GetSystem(block);
                      if (system != null)
                      {
-                        if (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedSearchModes.HasFlag((SearchModes)value))
+                        if (BARMod.Settings.Welder.AllowedSearchModes.HasFlag((SearchModes)value))
                         {
                            system.Settings.SearchMode = (SearchModes)value;
                            UpdateVisual(_ComponentCollectPriorityListBox);
@@ -266,22 +266,22 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
 
 
                   // --- Select work mode
-                  onlyOneAllowed = (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes & (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes - 1)) == 0;
+                  onlyOneAllowed = (BARMod.Settings.Welder.AllowedWorkModes & (BARMod.Settings.Welder.AllowedWorkModes - 1)) == 0;
                   comboBox = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlCombobox, IMyShipWelder>("WorkMode");
                   comboBox.Title = Texts.WorkMode;
                   comboBox.Tooltip = Texts.WorkMode_Tooltip;
                   comboBox.Enabled = onlyOneAllowed ? isReadonly : isBaRSystem;
                   comboBox.ComboBoxContent = (list) =>
                   {
-                     if (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes.HasFlag(WorkModes.WeldBeforeGrind))
+                     if (BARMod.Settings.Welder.AllowedWorkModes.HasFlag(WorkModes.WeldBeforeGrind))
                         list.Add(new MyTerminalControlComboBoxItem() { Key = (long)WorkModes.WeldBeforeGrind, Value = Texts.WorkMode_WeldB4Grind });
-                     if (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes.HasFlag(WorkModes.GrindBeforeWeld))
+                     if (BARMod.Settings.Welder.AllowedWorkModes.HasFlag(WorkModes.GrindBeforeWeld))
                         list.Add(new MyTerminalControlComboBoxItem() { Key = (long)WorkModes.GrindBeforeWeld, Value = Texts.WorkMode_GrindB4Weld });
-                     if (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes.HasFlag(WorkModes.GrindIfWeldGetStuck))
+                     if (BARMod.Settings.Welder.AllowedWorkModes.HasFlag(WorkModes.GrindIfWeldGetStuck))
                         list.Add(new MyTerminalControlComboBoxItem() { Key = (long)WorkModes.GrindIfWeldGetStuck, Value = Texts.WorkMode_GrindIfWeldStuck });
-                     if (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes.HasFlag(WorkModes.WeldOnly))
+                     if (BARMod.Settings.Welder.AllowedWorkModes.HasFlag(WorkModes.WeldOnly))
                         list.Add(new MyTerminalControlComboBoxItem() { Key = (long)WorkModes.WeldOnly, Value = Texts.WorkMode_WeldOnly });
-                     if (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes.HasFlag(WorkModes.GrindOnly))
+                     if (BARMod.Settings.Welder.AllowedWorkModes.HasFlag(WorkModes.GrindOnly))
                         list.Add(new MyTerminalControlComboBoxItem() { Key = (long)WorkModes.GrindOnly, Value = Texts.WorkMode_GrindOnly });
 
                   };
@@ -296,7 +296,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      var system = GetSystem(block);
                      if (system != null)
                      {
-                        if (NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedWorkModes.HasFlag((WorkModes)value))
+                        if (BARMod.Settings.Welder.AllowedWorkModes.HasFlag((WorkModes)value))
                         {
                            system.Settings.WorkMode = (WorkModes)value;
                         }
@@ -338,7 +338,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Tooltip = Texts.WeldUseIgnoreColor_Tooltip;
                      checkbox.OnText = MySpaceTexts.SwitchText_On;
                      checkbox.OffText = MySpaceTexts.SwitchText_Off;
-                     checkbox.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.UseIgnoreColorFixed || !weldingAllowed ? isReadonly : isBaRSystem;
+                     checkbox.Enabled = BARMod.Settings.Welder.UseIgnoreColorFixed || !weldingAllowed ? isReadonly : isBaRSystem;
                      checkbox.Visible = isWeldingAllowed;
                      checkbox.Getter = (block) =>
                      {
@@ -348,7 +348,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseIgnoreColorFixed && isWeldingAllowed(block))
+                        if (system != null && !BARMod.Settings.Welder.UseIgnoreColorFixed && isWeldingAllowed(block))
                         {
                            system.Settings.Flags = (system.Settings.Flags & ~SyncBlockSettings.Settings.UseIgnoreColor) | (value ? SyncBlockSettings.Settings.UseIgnoreColor : 0);
                            foreach (var ctrl in CustomControls)
@@ -360,12 +360,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.SupportsMultipleBlocks = true;
                      CreateCheckBoxAction("UseIgnoreColor", checkbox);
                      CustomControls.Add(checkbox);
-                     CreateProperty(checkbox, NanobotBuildAndRepairSystemMod.Settings.Welder.UseIgnoreColorFixed);
+                     CreateProperty(checkbox, BARMod.Settings.Welder.UseIgnoreColorFixed);
 
                      Func<IMyTerminalBlock, bool> colorPickerEnabled = (block) =>
                      {
                         var system = GetSystem(block);
-                        return system != null && (system.Settings.Flags & SyncBlockSettings.Settings.UseIgnoreColor) != 0 && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseIgnoreColorFixed && isWeldingAllowed(block);
+                        return system != null && (system.Settings.Flags & SyncBlockSettings.Settings.UseIgnoreColor) != 0 && !BARMod.Settings.Welder.UseIgnoreColorFixed && isWeldingAllowed(block);
                      };
 
                      button = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlButton, IMyShipWelder>("IgnoreColorPickCurrent");
@@ -515,7 +515,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      propertyIC.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseIgnoreColorFixed)
+                        if (system != null && !BARMod.Settings.Welder.UseIgnoreColorFixed)
                         {
                            system.Settings.IgnoreColor = CheckConvertToHSVColor(value);
                         }
@@ -537,7 +537,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Tooltip = Texts.WeldBuildNew_Tooltip;
                      checkbox.OnText = MySpaceTexts.SwitchText_On;
                      checkbox.OffText = MySpaceTexts.SwitchText_Off;
-                     checkbox.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.AllowBuildFixed || !weldingAllowed ? isReadonly : isBaRSystem;
+                     checkbox.Enabled = BARMod.Settings.Welder.AllowBuildFixed || !weldingAllowed ? isReadonly : isBaRSystem;
                      checkbox.Visible = isWeldingAllowed;
                      checkbox.Getter = (block) =>
                      {
@@ -547,7 +547,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.AllowBuildFixed && isWeldingAllowed(block))
+                        if (system != null && !BARMod.Settings.Welder.AllowBuildFixed && isWeldingAllowed(block))
                         {
                            system.Settings.Flags = (system.Settings.Flags & ~SyncBlockSettings.Settings.AllowBuild) | (value ? SyncBlockSettings.Settings.AllowBuild : 0);
                         }
@@ -555,7 +555,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.SupportsMultipleBlocks = true;
                      CreateCheckBoxAction("AllowBuild", checkbox);
                      CustomControls.Add(checkbox);
-                     CreateProperty(checkbox, NanobotBuildAndRepairSystemMod.Settings.Welder.AllowBuildFixed || !weldingAllowed);
+                     CreateProperty(checkbox, BARMod.Settings.Welder.AllowBuildFixed || !weldingAllowed);
 
                      //--Weld to functional only
                      checkbox = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlCheckbox, IMyShipWelder>("WeldOptionFunctionalOnly");
@@ -610,7 +610,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Enabled = (block) =>
                      {
                         var system = GetSystem(block);
-                        return system != null && system.BlockWeldPriority != null && system.BlockWeldPriority.Selected != null && isWeldingAllowed(block) && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed;
+                        return system != null && system.BlockWeldPriority != null && system.BlockWeldPriority.Selected != null && isWeldingAllowed(block) && !BARMod.Settings.Welder.PriorityFixed;
                      };
 
                      onoffSwitch.Getter = (block) =>
@@ -622,7 +622,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && system.BlockWeldPriority != null && system.BlockWeldPriority.Selected != null && isWeldingAllowed(block) && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed)
+                        if (system != null && system.BlockWeldPriority != null && system.BlockWeldPriority.Selected != null && isWeldingAllowed(block) && !BARMod.Settings.Welder.PriorityFixed)
                         {
                            system.BlockWeldPriority.SetEnabled(system.BlockWeldPriority.Selected.Key, value);
                            system.Settings.WeldPriority = system.BlockWeldPriority.GetEntries();
@@ -639,12 +639,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      button.Enabled = (block) =>
                      {
                         var system = GetSystem(block);
-                        return system != null && system.BlockWeldPriority != null && system.BlockWeldPriority.Selected != null && isWeldingAllowed(block) && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed;
+                        return system != null && system.BlockWeldPriority != null && system.BlockWeldPriority.Selected != null && isWeldingAllowed(block) && !BARMod.Settings.Welder.PriorityFixed;
                      };
                      button.Action = (block) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed)
+                        if (system != null && !BARMod.Settings.Welder.PriorityFixed)
                         {
                            system.BlockWeldPriority.MoveSelectedUp();
                            system.Settings.WeldPriority = system.BlockWeldPriority.GetEntries();
@@ -661,12 +661,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      button.Enabled = (block) =>
                      {
                         var system = GetSystem(block);
-                        return system != null && system.BlockWeldPriority != null && system.BlockWeldPriority.Selected != null && isWeldingAllowed(block) && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed;
+                        return system != null && system.BlockWeldPriority != null && system.BlockWeldPriority.Selected != null && isWeldingAllowed(block) && !BARMod.Settings.Welder.PriorityFixed;
                      };
                      button.Action = (block) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed)
+                        if (system != null && !BARMod.Settings.Welder.PriorityFixed)
                         {
                            system.BlockWeldPriority.MoveSelectedDown();
                            system.Settings.WeldPriority = system.BlockWeldPriority.GetEntries();
@@ -723,7 +723,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Tooltip = Texts.GrindUseGrindColor_Tooltip;
                      checkbox.OnText = MySpaceTexts.SwitchText_On;
                      checkbox.OffText = MySpaceTexts.SwitchText_Off;
-                     checkbox.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindColorFixed || !grindingAllowed ? isReadonly : isBaRSystem;
+                     checkbox.Enabled = BARMod.Settings.Welder.UseGrindColorFixed || !grindingAllowed ? isReadonly : isBaRSystem;
                      checkbox.Visible = isGrindingAllowed;
                      checkbox.Getter = (block) =>
                      {
@@ -733,7 +733,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindColorFixed && isGrindingAllowed(block))
+                        if (system != null && !BARMod.Settings.Welder.UseGrindColorFixed && isGrindingAllowed(block))
                         {
                            system.Settings.Flags = (system.Settings.Flags & ~SyncBlockSettings.Settings.UseGrindColor) | (value ? SyncBlockSettings.Settings.UseGrindColor : 0);
                            foreach (var ctrl in CustomControls)
@@ -745,12 +745,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.SupportsMultipleBlocks = true;
                      CreateCheckBoxAction("UseGrindColor", checkbox);
                      CustomControls.Add(checkbox);
-                     CreateProperty(checkbox, NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindColorFixed || !grindingAllowed);
+                     CreateProperty(checkbox, BARMod.Settings.Welder.UseGrindColorFixed || !grindingAllowed);
 
                      Func<IMyTerminalBlock, bool> colorPickerEnabled = (block) =>
                      {
                         var system = GetSystem(block);
-                        return system != null && (system.Settings.Flags & SyncBlockSettings.Settings.UseGrindColor) != 0 && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindColorFixed && isGrindingAllowed(block);
+                        return system != null && (system.Settings.Flags & SyncBlockSettings.Settings.UseGrindColor) != 0 && !BARMod.Settings.Welder.UseGrindColorFixed && isGrindingAllowed(block);
                      };
 
                      button = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlButton, IMyShipWelder>("GrindColorPickCurrent");
@@ -901,7 +901,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      propertyGC.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindColorFixed)
+                        if (system != null && !BARMod.Settings.Welder.UseGrindColorFixed)
                         {
                            system.Settings.GrindColor = CheckConvertToHSVColor(value);
                         }
@@ -920,7 +920,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Tooltip = Texts.GrindJanitorEnemy_Tooltip;
                      onoffSwitch.OnText = MySpaceTexts.SwitchText_On;
                      onoffSwitch.OffText = MySpaceTexts.SwitchText_Off;
-                     onoffSwitch.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedEnemies ? isReadonly : isBaRSystem;
+                     onoffSwitch.Enabled = BARMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedEnemies ? isReadonly : isBaRSystem;
                      onoffSwitch.Visible = isJanitorAllowedEnemies;
                      onoffSwitch.Getter = (block) =>
                      {
@@ -930,7 +930,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed && isJanitorAllowedEnemies(block))
+                        if (system != null && !BARMod.Settings.Welder.UseGrindJanitorFixed && isJanitorAllowedEnemies(block))
                         {
                            system.Settings.UseGrindJanitorOn = (system.Settings.UseGrindJanitorOn & ~AutoGrindRelation.Enemies) | (value ? AutoGrindRelation.Enemies : 0);
                         }
@@ -938,7 +938,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.SupportsMultipleBlocks = true;
                      CreateOnOffSwitchAction("GrindJanitorEnemies", onoffSwitch);
                      CustomControls.Add(onoffSwitch);
-                     CreateProperty(onoffSwitch, NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedEnemies);
+                     CreateProperty(onoffSwitch, BARMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedEnemies);
 
                      //--Grind not owned
                      onoffSwitch = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlOnOffSwitch, IMyShipWelder>("GrindJanitorNotOwned");
@@ -946,7 +946,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Tooltip = Texts.GrindJanitorNotOwned_Tooltip;
                      onoffSwitch.OnText = MySpaceTexts.SwitchText_On;
                      onoffSwitch.OffText = MySpaceTexts.SwitchText_Off;
-                     onoffSwitch.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedNoOwnership ? isReadonly : isBaRSystem;
+                     onoffSwitch.Enabled = BARMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedNoOwnership ? isReadonly : isBaRSystem;
                      onoffSwitch.Visible = isJanitorAllowedNoOwnership;
                      onoffSwitch.Getter = (block) =>
                      {
@@ -956,7 +956,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed && isJanitorAllowedNoOwnership(block))
+                        if (system != null && !BARMod.Settings.Welder.UseGrindJanitorFixed && isJanitorAllowedNoOwnership(block))
                         {
                            system.Settings.UseGrindJanitorOn = (system.Settings.UseGrindJanitorOn & ~AutoGrindRelation.NoOwnership) | (value ? AutoGrindRelation.NoOwnership : 0);
                         }
@@ -964,7 +964,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.SupportsMultipleBlocks = true;
                      CreateOnOffSwitchAction("GrindJanitorNotOwned", onoffSwitch);
                      CustomControls.Add(onoffSwitch);
-                     CreateProperty(onoffSwitch, NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedNoOwnership);
+                     CreateProperty(onoffSwitch, BARMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedNoOwnership);
 
                      //--Grind Neutrals
                      onoffSwitch = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlOnOffSwitch, IMyShipWelder>("GrindJanitorNeutrals");
@@ -972,7 +972,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Tooltip = Texts.GrindJanitorNeutrals_Tooltip;
                      onoffSwitch.OnText = MySpaceTexts.SwitchText_On;
                      onoffSwitch.OffText = MySpaceTexts.SwitchText_Off;
-                     onoffSwitch.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedNeutral ? isReadonly : isBaRSystem;
+                     onoffSwitch.Enabled = BARMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedNeutral ? isReadonly : isBaRSystem;
                      onoffSwitch.Visible = isJanitorAllowedNeutral;
                      onoffSwitch.Getter = (block) =>
                      {
@@ -982,7 +982,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed && isJanitorAllowedNeutral(block))
+                        if (system != null && !BARMod.Settings.Welder.UseGrindJanitorFixed && isJanitorAllowedNeutral(block))
                         {
                            system.Settings.UseGrindJanitorOn = (system.Settings.UseGrindJanitorOn & ~AutoGrindRelation.Neutral) | (value ? AutoGrindRelation.Neutral : 0);
                         }
@@ -990,7 +990,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.SupportsMultipleBlocks = true;
                      CreateOnOffSwitchAction("GrindJanitorNeutrals", onoffSwitch);
                      CustomControls.Add(onoffSwitch);
-                     CreateProperty(onoffSwitch, NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedNeutral);
+                     CreateProperty(onoffSwitch, BARMod.Settings.Welder.UseGrindJanitorFixed || !janitorAllowedNeutral);
                   }
 
                   //Grind Options
@@ -1004,7 +1004,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Tooltip = Texts.GrindJanitorDisableOnly_Tooltip;
                      checkbox.OnText = MySpaceTexts.SwitchText_On;
                      checkbox.OffText = MySpaceTexts.SwitchText_Off;
-                     checkbox.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || !grindingAllowed ? isReadonly : isBaRSystem;
+                     checkbox.Enabled = BARMod.Settings.Welder.UseGrindJanitorFixed || !grindingAllowed ? isReadonly : isBaRSystem;
                      checkbox.Visible = isJanitorAllowed;
                      checkbox.Getter = (block) =>
                      {
@@ -1014,7 +1014,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed && isJanitorAllowed(block))
+                        if (system != null && !BARMod.Settings.Welder.UseGrindJanitorFixed && isJanitorAllowed(block))
                         {
                         //Only one option (HackOnly or DisableOnly) at a time is allowed 
                         if (value)
@@ -1034,7 +1034,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.SupportsMultipleBlocks = true;
                      CreateCheckBoxAction("GrindJanitorOptionDisableOnly", checkbox);
                      CustomControls.Add(checkbox);
-                     CreateProperty(checkbox, NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || !grindingAllowed);
+                     CreateProperty(checkbox, BARMod.Settings.Welder.UseGrindJanitorFixed || !grindingAllowed);
 
                      //--Grind Hack only
                      checkbox = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlCheckbox, IMyShipWelder>("GrindJanitorOptionHackOnly");
@@ -1042,7 +1042,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Tooltip = Texts.GrindJanitorHackOnly_Tooltip;
                      checkbox.OnText = MySpaceTexts.SwitchText_On;
                      checkbox.OffText = MySpaceTexts.SwitchText_Off;
-                     checkbox.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || !grindingAllowed ? isReadonly : isBaRSystem;
+                     checkbox.Enabled = BARMod.Settings.Welder.UseGrindJanitorFixed || !grindingAllowed ? isReadonly : isBaRSystem;
                      checkbox.Visible = isJanitorAllowed;
                      checkbox.Getter = (block) =>
                      {
@@ -1052,7 +1052,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed && isJanitorAllowed(block))
+                        if (system != null && !BARMod.Settings.Welder.UseGrindJanitorFixed && isJanitorAllowed(block))
                         {
                         //Only one option (HackOnly or DisableOnly) at a time is allowed 
                         if (value)
@@ -1072,7 +1072,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.SupportsMultipleBlocks = true;
                      CreateCheckBoxAction("GrindJanitorOptionHackOnly", checkbox);
                      CustomControls.Add(checkbox);
-                     CreateProperty(checkbox, NanobotBuildAndRepairSystemMod.Settings.Welder.UseGrindJanitorFixed || !grindingAllowed);
+                     CreateProperty(checkbox, BARMod.Settings.Welder.UseGrindJanitorFixed || !grindingAllowed);
                   }
 
                   //Grind Priority
@@ -1090,7 +1090,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Enabled = (block) =>
                      {
                         var system = GetSystem(block);
-                        return system != null && system.BlockGrindPriority != null && system.BlockGrindPriority.Selected != null && isGrindingAllowed(block) && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed;
+                        return system != null && system.BlockGrindPriority != null && system.BlockGrindPriority.Selected != null && isGrindingAllowed(block) && !BARMod.Settings.Welder.PriorityFixed;
                      };
 
                      onoffSwitch.Getter = (block) =>
@@ -1102,7 +1102,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && system.BlockGrindPriority != null && system.BlockGrindPriority.Selected != null && isGrindingAllowed(block) && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed)
+                        if (system != null && system.BlockGrindPriority != null && system.BlockGrindPriority.Selected != null && isGrindingAllowed(block) && !BARMod.Settings.Welder.PriorityFixed)
                         {
                            system.BlockGrindPriority.SetEnabled(system.BlockGrindPriority.Selected.Key, value);
                            system.Settings.GrindPriority = system.BlockGrindPriority.GetEntries();
@@ -1119,12 +1119,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      button.Enabled = (block) =>
                      {
                         var system = GetSystem(block);
-                        return system != null && system.BlockGrindPriority != null && system.BlockGrindPriority.Selected != null && isGrindingAllowed(block) && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed;
+                        return system != null && system.BlockGrindPriority != null && system.BlockGrindPriority.Selected != null && isGrindingAllowed(block) && !BARMod.Settings.Welder.PriorityFixed;
                      };
                      button.Action = (block) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed)
+                        if (system != null && !BARMod.Settings.Welder.PriorityFixed)
                         {
                            system.BlockGrindPriority.MoveSelectedUp();
                            system.Settings.GrindPriority = system.BlockGrindPriority.GetEntries();
@@ -1141,12 +1141,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      button.Enabled = (block) =>
                      {
                         var system = GetSystem(block);
-                        return system != null && system.BlockGrindPriority != null && system.BlockGrindPriority.Selected != null && isGrindingAllowed(block) && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed;
+                        return system != null && system.BlockGrindPriority != null && system.BlockGrindPriority.Selected != null && isGrindingAllowed(block) && !BARMod.Settings.Welder.PriorityFixed;
                      };
                      button.Action = (block) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.PriorityFixed)
+                        if (system != null && !BARMod.Settings.Welder.PriorityFixed)
                         {
                            system.BlockGrindPriority.MoveSelectedDown();
                            system.Settings.GrindPriority = system.BlockGrindPriority.GetEntries();
@@ -1320,7 +1320,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      onoffSwitch.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && system.ComponentCollectPriority != null && system.ComponentCollectPriority.Selected != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.CollectPriorityFixed)
+                        if (system != null && system.ComponentCollectPriority != null && system.ComponentCollectPriority.Selected != null && !BARMod.Settings.Welder.CollectPriorityFixed)
                         {
                            system.ComponentCollectPriority.SetEnabled(system.ComponentCollectPriority.Selected.Key, value);
                            system.Settings.ComponentCollectPriority = system.ComponentCollectPriority.GetEntries();
@@ -1337,7 +1337,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      button.Action = (block) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.CollectPriorityFixed)
+                        if (system != null && !BARMod.Settings.Welder.CollectPriorityFixed)
                         {
                            system.ComponentCollectPriority.MoveSelectedUp();
                            system.Settings.ComponentCollectPriority = system.ComponentCollectPriority.GetEntries();
@@ -1354,7 +1354,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      button.Action = (block) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.CollectPriorityFixed)
+                        if (system != null && !BARMod.Settings.Welder.CollectPriorityFixed)
                         {
                            system.ComponentCollectPriority.MoveSelectedDown();
                            system.Settings.ComponentCollectPriority = system.ComponentCollectPriority.GetEntries();
@@ -1400,7 +1400,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Tooltip = Texts.CollectOnlyIfIdle_Tooltip;
                      checkbox.OnText = MySpaceTexts.SwitchText_On;
                      checkbox.OffText = MySpaceTexts.SwitchText_Off;
-                     checkbox.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.CollectIfIdleFixed ? isReadonly : isCollectPossible;
+                     checkbox.Enabled = BARMod.Settings.Welder.CollectIfIdleFixed ? isReadonly : isCollectPossible;
                      checkbox.Getter = (block) =>
                      {
                         var system = GetSystem(block);
@@ -1409,7 +1409,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.CollectIfIdleFixed)
+                        if (system != null && !BARMod.Settings.Welder.CollectIfIdleFixed)
                         {
                            system.Settings.Flags = (system.Settings.Flags & ~SyncBlockSettings.Settings.ComponentCollectIfIdle) | (value ? SyncBlockSettings.Settings.ComponentCollectIfIdle : 0);
                         }
@@ -1417,7 +1417,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.SupportsMultipleBlocks = true;
                      CreateCheckBoxAction("CollectIfIdle", checkbox);
                      CustomControls.Add(checkbox);
-                     CreateProperty(checkbox, NanobotBuildAndRepairSystemMod.Settings.Welder.CollectIfIdleFixed);
+                     CreateProperty(checkbox, BARMod.Settings.Welder.CollectIfIdleFixed);
 
                      //Push Ingot/ore immediately
                      checkbox = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlCheckbox, IMyShipWelder>("PushIngotOreImmediately");
@@ -1425,7 +1425,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Tooltip = Texts.CollectPushOre_Tooltip;
                      checkbox.OnText = MySpaceTexts.SwitchText_On;
                      checkbox.OffText = MySpaceTexts.SwitchText_Off;
-                     checkbox.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.PushIngotOreImmediatelyFixed ? isReadonly : isBaRSystem;
+                     checkbox.Enabled = BARMod.Settings.Welder.PushIngotOreImmediatelyFixed ? isReadonly : isBaRSystem;
                      checkbox.Getter = (block) =>
                      {
                         var system = GetSystem(block);
@@ -1434,7 +1434,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.PushIngotOreImmediatelyFixed)
+                        if (system != null && !BARMod.Settings.Welder.PushIngotOreImmediatelyFixed)
                         {
                            system.Settings.Flags = (system.Settings.Flags & ~SyncBlockSettings.Settings.PushIngotOreImmediately) | (value ? SyncBlockSettings.Settings.PushIngotOreImmediately : 0);
                         }
@@ -1442,7 +1442,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.SupportsMultipleBlocks = true;
                      CreateCheckBoxAction("PushIngotOreImmediately", checkbox);
                      CustomControls.Add(checkbox);
-                     CreateProperty(checkbox, NanobotBuildAndRepairSystemMod.Settings.Welder.PushIngotOreImmediatelyFixed);
+                     CreateProperty(checkbox, BARMod.Settings.Welder.PushIngotOreImmediatelyFixed);
 
                      //Push Items immediately
                      checkbox = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlCheckbox, IMyShipWelder>("PushItemsImmediately");
@@ -1450,7 +1450,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Tooltip = Texts.CollectPushItems_Tooltip;
                      checkbox.OnText = MySpaceTexts.SwitchText_On;
                      checkbox.OffText = MySpaceTexts.SwitchText_Off;
-                     checkbox.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.PushItemsImmediatelyFixed ? isReadonly : isBaRSystem;
+                     checkbox.Enabled = BARMod.Settings.Welder.PushItemsImmediatelyFixed ? isReadonly : isBaRSystem;
                      checkbox.Getter = (block) =>
                      {
                         var system = GetSystem(block);
@@ -1459,7 +1459,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.PushItemsImmediatelyFixed)
+                        if (system != null && !BARMod.Settings.Welder.PushItemsImmediatelyFixed)
                         {
                            system.Settings.Flags = (system.Settings.Flags & ~SyncBlockSettings.Settings.PushItemsImmediately) | (value ? SyncBlockSettings.Settings.PushItemsImmediately : 0);
                         }
@@ -1467,7 +1467,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.SupportsMultipleBlocks = true;
                      CreateCheckBoxAction("PushItemsImmediately", checkbox);
                      CustomControls.Add(checkbox);
-                     CreateProperty(checkbox, NanobotBuildAndRepairSystemMod.Settings.Welder.PushItemsImmediatelyFixed);
+                     CreateProperty(checkbox, BARMod.Settings.Welder.PushItemsImmediatelyFixed);
 
                      //Push Component immediately
                      checkbox = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlCheckbox, IMyShipWelder>("PushComponentImmediately");
@@ -1475,7 +1475,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Tooltip = Texts.CollectPushComp_Tooltip;
                      checkbox.OnText = MySpaceTexts.SwitchText_On;
                      checkbox.OffText = MySpaceTexts.SwitchText_Off;
-                     checkbox.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.PushComponentImmediatelyFixed ? isReadonly : isBaRSystem;
+                     checkbox.Enabled = BARMod.Settings.Welder.PushComponentImmediatelyFixed ? isReadonly : isBaRSystem;
                      checkbox.Getter = (block) =>
                      {
                         var system = GetSystem(block);
@@ -1484,7 +1484,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.Setter = (block, value) =>
                      {
                         var system = GetSystem(block);
-                        if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.PushComponentImmediatelyFixed)
+                        if (system != null && !BARMod.Settings.Welder.PushComponentImmediatelyFixed)
                         {
                            system.Settings.Flags = (system.Settings.Flags & ~SyncBlockSettings.Settings.PushComponentImmediately) | (value ? SyncBlockSettings.Settings.PushComponentImmediately : 0);
                         }
@@ -1492,7 +1492,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      checkbox.SupportsMultipleBlocks = true;
                      CreateCheckBoxAction("PushComponentImmediately", checkbox);
                      CustomControls.Add(checkbox);
-                     CreateProperty(checkbox, NanobotBuildAndRepairSystemMod.Settings.Welder.PushComponentImmediatelyFixed);
+                     CreateProperty(checkbox, BARMod.Settings.Welder.PushComponentImmediatelyFixed);
                   }
                }
 
@@ -1503,19 +1503,19 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   Func<IMyTerminalBlock, float> getLimitOffsetMin = (block) =>
                   {
                      var system = GetSystem(block);
-                     return system != null && system.Settings != null ? -system.Settings.MaximumOffset : -NanobotBuildAndRepairSystemBlock.WELDER_OFFSET_MAX_IN_M;
+                     return system != null && system.Settings != null ? -system.Settings.MaximumOffset : -BARBlock.WELDER_OFFSET_MAX_IN_M;
                   };
                   Func<IMyTerminalBlock, float> getLimitOffsetMax = (block) =>
                   {
                      var system = GetSystem(block);
-                     return system != null && system.Settings != null ? system.Settings.MaximumOffset : NanobotBuildAndRepairSystemBlock.WELDER_OFFSET_MAX_IN_M;
+                     return system != null && system.Settings != null ? system.Settings.MaximumOffset : BARBlock.WELDER_OFFSET_MAX_IN_M;
                   };
 
-                  Func<IMyTerminalBlock, float> getLimitMin = (block) => NanobotBuildAndRepairSystemBlock.WELDER_RANGE_MIN_IN_M;
+                  Func<IMyTerminalBlock, float> getLimitMin = (block) => BARBlock.WELDER_RANGE_MIN_IN_M;
                   Func<IMyTerminalBlock, float> getLimitMax = (block) =>
                   {
                      var system = GetSystem(block);
-                     return system != null && system.Settings != null ? system.Settings.MaximumRange : NanobotBuildAndRepairSystemBlock.WELDER_RANGE_MAX_IN_M;
+                     return system != null && system.Settings != null ? system.Settings.MaximumRange : BARBlock.WELDER_RANGE_MAX_IN_M;
                   };
 
                   checkbox = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlCheckbox, IMyShipWelder>("ShowArea");
@@ -1523,7 +1523,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   checkbox.Tooltip = Texts.AreaShow_Tooltip;
                   checkbox.OnText = MySpaceTexts.SwitchText_On;
                   checkbox.OffText = MySpaceTexts.SwitchText_Off;
-                  checkbox.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.ShowAreaFixed ? isReadonly : isBaRSystem;
+                  checkbox.Enabled = BARMod.Settings.Welder.ShowAreaFixed ? isReadonly : isBaRSystem;
                   checkbox.Getter = (block) =>
                   {
                      var system = GetSystem(block);
@@ -1537,7 +1537,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   checkbox.Setter = (block, value) =>
                   {
                      var system = GetSystem(block);
-                     if (system != null && !NanobotBuildAndRepairSystemMod.Settings.Welder.ShowAreaFixed)
+                     if (system != null && !BARMod.Settings.Welder.ShowAreaFixed)
                      {
                         system.Settings.Flags = (system.Settings.Flags & ~SyncBlockSettings.Settings.ShowArea) | (value ? SyncBlockSettings.Settings.ShowArea : 0);
                      }
@@ -1545,13 +1545,13 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   checkbox.SupportsMultipleBlocks = true;
                   CreateCheckBoxAction("ShowArea", checkbox);
                   CustomControls.Add(checkbox);
-                  CreateProperty(checkbox, NanobotBuildAndRepairSystemMod.Settings.Welder.ShowAreaFixed);
+                  CreateProperty(checkbox, BARMod.Settings.Welder.ShowAreaFixed);
 
                   //Slider Offset
                   slider = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyShipWelder>("AreaOffsetLeftRight");
                   slider.Title = MySpaceTexts.BlockPropertyTitle_ProjectionOffsetX;
                   slider.SetLimits(getLimitOffsetMin, getLimitOffsetMax);
-                  slider.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.AreaOffsetFixed ? isReadonly : isBaRSystem;
+                  slider.Enabled = BARMod.Settings.Welder.AreaOffsetFixed ? isReadonly : isBaRSystem;
                   slider.Getter = (block) =>
                   {
                      var system = GetSystem(block);
@@ -1580,12 +1580,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   slider.SupportsMultipleBlocks = true;
                   CustomControls.Add(slider);
                   CreateSliderActions("AreaOffsetLeftRight", slider);
-                  CreateProperty(slider, NanobotBuildAndRepairSystemMod.Settings.Welder.AreaOffsetFixed);
+                  CreateProperty(slider, BARMod.Settings.Welder.AreaOffsetFixed);
 
                   slider = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyShipWelder>("AreaOffsetUpDown");
                   slider.Title = MySpaceTexts.BlockPropertyTitle_ProjectionOffsetY;
                   slider.SetLimits(getLimitOffsetMin, getLimitOffsetMax);
-                  slider.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.AreaOffsetFixed ? isReadonly : isBaRSystem;
+                  slider.Enabled = BARMod.Settings.Welder.AreaOffsetFixed ? isReadonly : isBaRSystem;
                   slider.Getter = (block) =>
                   {
                      var system = GetSystem(block);
@@ -1614,12 +1614,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   slider.SupportsMultipleBlocks = true;
                   CustomControls.Add(slider);
                   CreateSliderActions("AreaOffsetUpDown", slider);
-                  CreateProperty(slider, NanobotBuildAndRepairSystemMod.Settings.Welder.AreaOffsetFixed);
+                  CreateProperty(slider, BARMod.Settings.Welder.AreaOffsetFixed);
 
                   slider = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyShipWelder>("AreaOffsetFrontBack");
                   slider.Title = MySpaceTexts.BlockPropertyTitle_ProjectionOffsetZ;
                   slider.SetLimits(getLimitOffsetMin, getLimitOffsetMax);
-                  slider.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.AreaOffsetFixed ? isReadonly : isBaRSystem;
+                  slider.Enabled = BARMod.Settings.Welder.AreaOffsetFixed ? isReadonly : isBaRSystem;
                   slider.Getter = (block) =>
                   {
                      var system = GetSystem(block);
@@ -1648,13 +1648,13 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   slider.SupportsMultipleBlocks = true;
                   CustomControls.Add(slider);
                   CreateSliderActions("AreaOffsetFrontBack", slider);
-                  CreateProperty(slider, NanobotBuildAndRepairSystemMod.Settings.Welder.AreaOffsetFixed);
+                  CreateProperty(slider, BARMod.Settings.Welder.AreaOffsetFixed);
 
                   //Slider Area
                   slider = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyShipWelder>("AreaWidth");
                   slider.Title = Texts.AreaWidth;
                   slider.SetLimits(getLimitMin, getLimitMax);
-                  slider.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.AreaSizeFixed ? isReadonly : isBaRSystem;
+                  slider.Enabled = BARMod.Settings.Welder.AreaSizeFixed ? isReadonly : isBaRSystem;
                   slider.Getter = (block) =>
                   {
                      var system = GetSystem(block);
@@ -1682,12 +1682,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   slider.SupportsMultipleBlocks = true;
                   CustomControls.Add(slider);
                   CreateSliderActions("AreaWidth", slider);
-                  CreateProperty(slider, NanobotBuildAndRepairSystemMod.Settings.Welder.AreaSizeFixed);
+                  CreateProperty(slider, BARMod.Settings.Welder.AreaSizeFixed);
 
                   slider = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyShipWelder>("AreaHeight");
                   slider.Title = Texts.AreaHeight;
                   slider.SetLimits(getLimitMin, getLimitMax);
-                  slider.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.AreaSizeFixed ? isReadonly : isBaRSystem;
+                  slider.Enabled = BARMod.Settings.Welder.AreaSizeFixed ? isReadonly : isBaRSystem;
                   slider.Getter = (block) =>
                   {
                      var system = GetSystem(block);
@@ -1715,12 +1715,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   slider.SupportsMultipleBlocks = true;
                   CustomControls.Add(slider);
                   CreateSliderActions("AreaHeight", slider);
-                  CreateProperty(slider, NanobotBuildAndRepairSystemMod.Settings.Welder.AreaSizeFixed);
+                  CreateProperty(slider, BARMod.Settings.Welder.AreaSizeFixed);
 
                   slider = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyShipWelder>("AreaDepth");
                   slider.Title = Texts.AreaDepth;
                   slider.SetLimits(getLimitMin, getLimitMax);
-                  slider.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.AreaSizeFixed ? isReadonly : isBaRSystem;
+                  slider.Enabled = BARMod.Settings.Welder.AreaSizeFixed ? isReadonly : isBaRSystem;
                   slider.Getter = (block) =>
                   {
                      var system = GetSystem(block);
@@ -1748,7 +1748,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   slider.SupportsMultipleBlocks = true;
                   CustomControls.Add(slider);
                   CreateSliderActions("AreaDepth", slider);
-                  CreateProperty(slider, NanobotBuildAndRepairSystemMod.Settings.Welder.AreaSizeFixed);
+                  CreateProperty(slider, BARMod.Settings.Welder.AreaSizeFixed);
 
                   // -- Sound enabled
                   separateArea = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSeparator, IMyShipWelder>("SeparateOther");
@@ -1757,11 +1757,11 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                   slider = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyShipWelder>("SoundVolume");
                   slider.Title = Texts.SoundVolume;
                   slider.SetLimits(0f, 100f);
-                  slider.Enabled = NanobotBuildAndRepairSystemMod.Settings.Welder.SoundVolumeFixed ? isReadonly : isBaRSystem;
+                  slider.Enabled = BARMod.Settings.Welder.SoundVolumeFixed ? isReadonly : isBaRSystem;
                   slider.Getter = (block) =>
                   {
                      var system = GetSystem(block);
-                     return system != null ? 100f * system.Settings.SoundVolume / NanobotBuildAndRepairSystemBlock.WELDER_SOUND_VOLUME : 0f;
+                     return system != null ? 100f * system.Settings.SoundVolume / BARBlock.WELDER_SOUND_VOLUME : 0f;
                   };
                   slider.Setter = (block, val) =>
                   {
@@ -1771,7 +1771,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                         var min = 0;
                         var max = 100;
                         val = val < min ? min : val > max ? max : val;
-                        system.Settings.SoundVolume = (float)Math.Round(val * NanobotBuildAndRepairSystemBlock.WELDER_SOUND_VOLUME) / 100f;
+                        system.Settings.SoundVolume = (float)Math.Round(val * BARBlock.WELDER_SOUND_VOLUME) / 100f;
                      }
                   };
                   slider.Writer = (block, val) =>
@@ -1779,17 +1779,17 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                      var system = GetSystem(block);
                      if (system != null)
                      {
-                        val.Append(Math.Round(100f * system.Settings.SoundVolume / NanobotBuildAndRepairSystemBlock.WELDER_SOUND_VOLUME) + " %");
+                        val.Append(Math.Round(100f * system.Settings.SoundVolume / BARBlock.WELDER_SOUND_VOLUME) + " %");
                      }
                   };
                   slider.SupportsMultipleBlocks = true;
                   CustomControls.Add(slider);
                   CreateSliderActions("SoundVolume", slider);
-                  CreateProperty(slider, NanobotBuildAndRepairSystemMod.Settings.Welder.SoundVolumeFixed);
+                  CreateProperty(slider, BARMod.Settings.Welder.SoundVolumeFixed);
                }
 
                // -- Script Control
-               if (!NanobotBuildAndRepairSystemMod.Settings.Welder.ScriptControllFixed)
+               if (!BARMod.Settings.Welder.ScriptControllFixed)
                {
                   separateArea = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSeparator, IMyShipWelder>("SeparateScriptControl");
                   CustomControls.Add(separateArea);
@@ -2264,8 +2264,8 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
          if (value.Z > 100f) value.Z = 100f;
 
          return new Vector3(value.X / 360f,
-                           (value.Y / 100f) - NanobotBuildAndRepairSystemTerminal.SATURATION_DELTA,
-                           (value.Z / 100f) - NanobotBuildAndRepairSystemTerminal.VALUE_DELTA + NanobotBuildAndRepairSystemTerminal.VALUE_COLORIZE_DELTA);
+                           (value.Y / 100f) - BARTerminal.SATURATION_DELTA,
+                           (value.Z / 100f) - BARTerminal.VALUE_DELTA + BARTerminal.VALUE_COLORIZE_DELTA);
       }
 
       private static Vector3 ConvertFromHSVColor(Vector3 value)

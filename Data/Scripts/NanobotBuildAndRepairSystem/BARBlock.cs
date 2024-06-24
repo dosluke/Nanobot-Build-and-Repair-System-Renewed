@@ -36,7 +36,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
     }
 
     [MyEntityComponentDescriptor(typeof(MyObjectBuilder_ShipWelder), false, "SELtdLargeNanobotBuildAndRepairSystem", "SELtdSmallNanobotBuildAndRepairSystem")]
-    public class NanobotBuildAndRepairSystemBlock : MyGameLogicComponent
+    public class BARBlock : MyGameLogicComponent
     {
         public const int WELDER_RANGE_DEFAULT_IN_M = 75; //*2 = AreaSize
         public const int WELDER_RANGE_MAX_IN_M = 2000;
@@ -94,7 +94,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
         private Dictionary<string, int> _TempMissingComponents = new Dictionary<string, int>();
         private TimeSpan _LastFriendlyDamageCleanup;
 
-        private TimeSpan _LastSourceUpdate = -NanobotBuildAndRepairSystemMod.Settings.SourcesUpdateInterval;
+        private TimeSpan _LastSourceUpdate = -BARMod.Settings.SourcesUpdateInterval;
         private TimeSpan _LastTargetsUpdate;
 
         private bool _CreativeModeActive;
@@ -118,7 +118,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
         internal SyncBlockSettings Settings {
             get
             {
-                return (_Settings != null) ? _Settings : _Settings = SyncBlockSettings.Load(this, NanobotBuildAndRepairSystemMod.ModGuid, BlockWeldPriority, BlockGrindPriority, ComponentCollectPriority);
+                return (_Settings != null) ? _Settings : _Settings = SyncBlockSettings.Load(this, BARMod.ModGuid, BlockWeldPriority, BlockGrindPriority, ComponentCollectPriority);
             }
         }
 
@@ -201,25 +201,25 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
         /// </summary>
         public void SettingsChanged()
         {
-            if (NanobotBuildAndRepairSystemMod.SettingsValid) 
+            if (BARMod.SettingsValid) 
             {
                 //Check limits as soon but not sooner as the 'server' settings has been received, otherwise we might use the wrong limits
                 Settings.CheckLimits(this, false);
-                _SoundController.UpdateSettings(NanobotBuildAndRepairSystemMod.Settings.Welder);
+                _SoundController.UpdateSettings(BARMod.Settings.Welder);
             }
 
             var resourceSink = _Welder.ResourceSink as Sandbox.Game.EntityComponents.MyResourceSinkComponent;
             if (resourceSink != null)
             {
             var electricPowerTransport = Settings.MaximumRequiredElectricPowerTransport;
-            if ((NanobotBuildAndRepairSystemMod.Settings.Welder.AllowedSearchModes & SearchModes.BoundingBox) == 0) electricPowerTransport /= 10;
+            if ((BARMod.Settings.Welder.AllowedSearchModes & SearchModes.BoundingBox) == 0) electricPowerTransport /= 10;
             var maxPowerWorking = Math.Max(Settings.MaximumRequiredElectricPowerWelding, Settings.MaximumRequiredElectricPowerGrinding);
             resourceSink.SetMaxRequiredInputByType(ElectricityId, maxPowerWorking + electricPowerTransport + Settings.MaximumRequiredElectricPowerStandby);
             resourceSink.SetRequiredInputFuncByType(ElectricityId, ComputeRequiredElectricPower);
             resourceSink.Update();
             }
 
-            var maxMultiplier = Math.Max(NanobotBuildAndRepairSystemMod.Settings.Welder.WeldingMultiplier, NanobotBuildAndRepairSystemMod.Settings.Welder.GrindingMultiplier);
+            var maxMultiplier = Math.Max(BARMod.Settings.Welder.WeldingMultiplier, BARMod.Settings.Welder.GrindingMultiplier);
             if (maxMultiplier > 10) NeedsUpdate = MyEntityUpdateEnum.EACH_FRAME | MyEntityUpdateEnum.EACH_10TH_FRAME;
             else NeedsUpdate = MyEntityUpdateEnum.EACH_FRAME | MyEntityUpdateEnum.EACH_100TH_FRAME;
 
@@ -242,14 +242,14 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
             return;
             }
 
-            lock (NanobotBuildAndRepairSystemMod.BuildAndRepairSystems)
+            lock (BARMod.BuildAndRepairSystems)
             {
-            if (!NanobotBuildAndRepairSystemMod.BuildAndRepairSystems.ContainsKey(Entity.EntityId))
+            if (!BARMod.BuildAndRepairSystems.ContainsKey(Entity.EntityId))
             {
-                NanobotBuildAndRepairSystemMod.BuildAndRepairSystems.Add(Entity.EntityId, this);
+                BARMod.BuildAndRepairSystems.Add(Entity.EntityId, this);
             }
             }
-            NanobotBuildAndRepairSystemMod.InitControls();
+            BARMod.InitControls();
 
             _Welder.EnabledChanged += (block) => { this.UpdateCustomInfo(true); };
             _Welder.IsWorkingChanged += (block) => { this.UpdateCustomInfo(true); };
@@ -261,7 +261,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
             if (Mod.Log.ShouldLog(Logging.Level.Event)) Mod.Log.Write(Logging.Level.Event, "BuildAndRepairSystemBlock {0}: Init Block TransportInventory Added to welder MaxVolume {1}", Logging.BlockName(_Welder, Logging.BlockNameOptions.None), (float)welderInventory.MaxVolume / MyAPIGateway.Session.BlocksInventorySizeMultiplier);
             SettingsChanged();
 
-            NanobotBuildAndRepairSystemMod.SyncBlockDataRequestSend(this);
+            BARMod.SyncBlockDataRequestSend(this);
             UpdateCustomInfo(true);
             _TryPushInventoryLast = MyAPIGateway.Session.ElapsedPlayTime.Add(TimeSpan.FromSeconds(10));
             _TryAutoPushInventoryLast = _TryPushInventoryLast;
@@ -331,11 +331,11 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
             if (_IsInit)
             {
             ServerEmptyTranportInventory(true);
-            Settings.Save(Entity, NanobotBuildAndRepairSystemMod.ModGuid);
+            Settings.Save(Entity, BARMod.ModGuid);
             if (Mod.Log.ShouldLog(Logging.Level.Event)) Mod.Log.Write(Logging.Level.Event, "BuildAndRepairSystemBlock {0}: Close Saved Settings {1}", Logging.BlockName(_Welder, Logging.BlockNameOptions.None), Settings.GetAsXML());
-            lock (NanobotBuildAndRepairSystemMod.BuildAndRepairSystems)
+            lock (BARMod.BuildAndRepairSystems)
             {
-                NanobotBuildAndRepairSystemMod.BuildAndRepairSystems.Remove(Entity.EntityId);
+                BARMod.BuildAndRepairSystems.Remove(Entity.EntityId);
             }
 
             //Stop effects
@@ -425,7 +425,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
             if (Mod.Log.ShouldLog(Logging.Level.Event)) Mod.Log.Write(Logging.Level.Event, "BuildAndRepairSystemBlock {0}: UpdatingStopped", Logging.BlockName(_Welder, Logging.BlockNameOptions.None));
             if (_IsInit)
             {
-            Settings.Save(Entity, NanobotBuildAndRepairSystemMod.ModGuid);
+            Settings.Save(Entity, BARMod.ModGuid);
             }
             _SoundController.StopSFX();
             _WorkingStateSet = WorkingState.Invalid;
@@ -474,10 +474,10 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                         }
                     }
 
-                    Settings.TrySave(Entity, NanobotBuildAndRepairSystemMod.ModGuid);
+                    Settings.TrySave(Entity, BARMod.ModGuid);
                     if (State.IsTransmitNeeded())
                     {
-                        NanobotBuildAndRepairSystemMod.SyncBlockStateSend(0, this);
+                        BARMod.SyncBlockStateSend(0, this);
                     }
                 }
             }
@@ -491,7 +491,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
             }
             if (Settings.IsTransmitNeeded())
             {
-                NanobotBuildAndRepairSystemMod.SyncBlockSettingsSend(0, this);
+                BARMod.SyncBlockSettingsSend(0, this);
             }
             if (_UpdateCustomInfoNeeded) UpdateCustomInfo(false);
 
@@ -985,7 +985,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                     {
                         if (Mod.Log.ShouldLog(Logging.Level.Info)) Mod.Log.Write(Logging.Level.Info, "BuildAndRepairSystemBlock {0}: ServerDoWeld (incomplete): {1}", Logging.BlockName(_Welder, Logging.BlockNameOptions.None), Logging.BlockName(target));
                         //target.MoveUnneededItemsFromConstructionStockpile(welderInventory); not available in modding api
-                        target.IncreaseMountLevel(MyAPIGateway.Session.WelderSpeedMultiplier * NanobotBuildAndRepairSystemMod.Settings.Welder.WeldingMultiplier * WELDER_AMOUNT_PER_SECOND, _Welder.OwnerId, welderInventory, MyAPIGateway.Session.WelderSpeedMultiplier * NanobotBuildAndRepairSystemMod.Settings.Welder.WeldingMultiplier * WELDER_MAX_REPAIR_BONE_MOVEMENT_SPEED, _Welder.HelpOthers);
+                        target.IncreaseMountLevel(MyAPIGateway.Session.WelderSpeedMultiplier * BARMod.Settings.Welder.WeldingMultiplier * WELDER_AMOUNT_PER_SECOND, _Welder.OwnerId, welderInventory, MyAPIGateway.Session.WelderSpeedMultiplier * BARMod.Settings.Welder.WeldingMultiplier * WELDER_MAX_REPAIR_BONE_MOVEMENT_SPEED, _Welder.HelpOthers);
                     }
                     if (target.IsFullIntegrity || (((Settings.WeldOptions & AutoWeldOptions.FunctionalOnly) != 0) && target.Integrity >= target.MaxIntegrity * ((MyCubeBlockDefinition)target.BlockDefinition).CriticalIntegrityRatio))
                     {
@@ -997,7 +997,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                     //Deformation
                     if (Mod.Log.ShouldLog(Logging.Level.Info)) Mod.Log.Write(Logging.Level.Info, "BuildAndRepairSystemBlock {0}: ServerDoWeld (deformed): {1}", Logging.BlockName(_Welder, Logging.BlockNameOptions.None), Logging.BlockName(target));
                     welding = true;
-                    target.IncreaseMountLevel(MyAPIGateway.Session.WelderSpeedMultiplier * NanobotBuildAndRepairSystemMod.Settings.Welder.WeldingMultiplier * WELDER_AMOUNT_PER_SECOND, _Welder.OwnerId, welderInventory, MyAPIGateway.Session.WelderSpeedMultiplier * NanobotBuildAndRepairSystemMod.Settings.Welder.WeldingMultiplier * WELDER_MAX_REPAIR_BONE_MOVEMENT_SPEED, _Welder.HelpOthers);
+                    target.IncreaseMountLevel(MyAPIGateway.Session.WelderSpeedMultiplier * BARMod.Settings.Welder.WeldingMultiplier * WELDER_AMOUNT_PER_SECOND, _Welder.OwnerId, welderInventory, MyAPIGateway.Session.WelderSpeedMultiplier * BARMod.Settings.Welder.WeldingMultiplier * WELDER_MAX_REPAIR_BONE_MOVEMENT_SPEED, _Welder.HelpOthers);
                 }
             }
             return welding || created;
@@ -1039,7 +1039,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
             var disassembleRatio = target.FatBlock != null ? target.FatBlock.DisassembleRatio : ((MyCubeBlockDefinition)target.BlockDefinition).DisassembleRatio;
             var integrityPointsPerSec = ((MyCubeBlockDefinition)target.BlockDefinition).IntegrityPointsPerSec;
 
-            float damage = MyAPIGateway.Session.GrinderSpeedMultiplier * NanobotBuildAndRepairSystemMod.Settings.Welder.GrindingMultiplier * GRINDER_AMOUNT_PER_SECOND;
+            float damage = MyAPIGateway.Session.GrinderSpeedMultiplier * BARMod.Settings.Welder.GrindingMultiplier * GRINDER_AMOUNT_PER_SECOND;
             var grinderAmount = damage * integrityPointsPerSec / disassembleRatio;
             integrityRatio = (target.Integrity - grinderAmount) / target.MaxIntegrity;
 
@@ -1083,14 +1083,14 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                 //Not available in modding
                 //MyAPIGateway.Session.DamageSystem.RaiseBeforeDamageApplied(target, ref damageInfo);
 
-                foreach (var entry in NanobotBuildAndRepairSystemMod.BuildAndRepairSystems)
+                foreach (var entry in BARMod.BuildAndRepairSystems)
                 {
                     var relation = entry.Value.Welder.GetUserRelationToOwner(_Welder.OwnerId);
                     if (MyRelationsBetweenPlayerAndBlockExtensions.IsFriendly(relation))
                     {
                         //A 'friendly' damage from grinder -> do not repair (for a while)
                         //I don't check block relation here, because if it is enemy we won't repair it in any case and it just times out
-                        entry.Value.FriendlyDamage[target] = MyAPIGateway.Session.ElapsedPlayTime + NanobotBuildAndRepairSystemMod.Settings.FriendlyDamageTimeout;
+                        entry.Value.FriendlyDamage[target] = MyAPIGateway.Session.ElapsedPlayTime + BARMod.Settings.FriendlyDamageTimeout;
                         if (Mod.Log.ShouldLog(Logging.Level.Info)) Mod.Log.Write(Logging.Level.Info, "BuildAndRepairSystemBlock: Damaged Add FriendlyDamage {0} Timeout {1}", Logging.BlockName(target), entry.Value.FriendlyDamage[target]);
                     }
                 }
@@ -1576,8 +1576,8 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
         public void UpdateSourcesAndTargetsTimer()
         {
             var playTime = MyAPIGateway.Session.ElapsedPlayTime;
-            var updateTargets = playTime.Subtract(_LastTargetsUpdate) >= NanobotBuildAndRepairSystemMod.Settings.TargetsUpdateInterval;
-            var updateSources = updateTargets && playTime.Subtract(_LastSourceUpdate) >= NanobotBuildAndRepairSystemMod.Settings.SourcesUpdateInterval;
+            var updateTargets = playTime.Subtract(_LastTargetsUpdate) >= BARMod.Settings.TargetsUpdateInterval;
+            var updateSources = updateTargets && playTime.Subtract(_LastSourceUpdate) >= BARMod.Settings.SourcesUpdateInterval;
             if (updateTargets)
             {
             StartAsyncUpdateSourcesAndTargets(updateSources);
@@ -1623,7 +1623,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
             {
             if (_AsyncUpdateSourcesAndTargetsRunning) return;
             _AsyncUpdateSourcesAndTargetsRunning = true;
-            NanobotBuildAndRepairSystemMod.AddAsyncAction(() => AsyncUpdateSourcesAndTargets(updateSource));
+            BARMod.AddAsyncAction(() => AsyncUpdateSourcesAndTargets(updateSource));
             }
         }
 
@@ -1711,7 +1711,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
                         var block = inventory.Owner as IMyShipWelder;
                         if (block != null && block.BlockDefinition.SubtypeName.Contains("NanobotBuildAndRepairSystem") && block.GameLogic != null)
                         {
-                        var bar = block.GameLogic.GetAs<NanobotBuildAndRepairSystemBlock>();
+                        var bar = block.GameLogic.GetAs<BARBlock>();
                         //Don't use Bar's as destination that would push immediately
                         if (bar != null)
                         {
@@ -2390,7 +2390,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
         private void CleanupFriendlyDamage()
         {
             var playTime = MyAPIGateway.Session.ElapsedPlayTime;
-            if (playTime.Subtract(_LastFriendlyDamageCleanup) > NanobotBuildAndRepairSystemMod.Settings.FriendlyDamageCleanup)
+            if (playTime.Subtract(_LastFriendlyDamageCleanup) > BARMod.Settings.FriendlyDamageCleanup)
             {
             //Cleanup
             var timedout = new List<IMySlimBlock>();

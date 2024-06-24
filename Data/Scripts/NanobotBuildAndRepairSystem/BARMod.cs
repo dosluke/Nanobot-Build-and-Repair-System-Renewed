@@ -18,7 +18,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
 
    static class Mod
    {
-      public static Logging Log = new Logging("NanobotBuildAndRepairSystem", 0, "NanobotBuildAndRepairSystem.log", typeof(NanobotBuildAndRepairSystemMod)) {
+      public static Logging Log = new Logging("NanobotBuildAndRepairSystem", 0, "NanobotBuildAndRepairSystem.log", typeof(BARMod)) {
          LogLevel = Logging.Level.Error, //Default
          EnableHudNotification = false
       };
@@ -78,7 +78,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
    */
 
    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
-   public class NanobotBuildAndRepairSystemMod : MySessionComponentBase
+   public class BARMod : MySessionComponentBase
    {
       private const string Version = "V2.1.6 2021-08-29"
       ;
@@ -121,12 +121,12 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
       /// <summary>
       /// Current known Build and Repair Systems in world
       /// </summary>
-      private static Dictionary<long, NanobotBuildAndRepairSystemBlock> _BuildAndRepairSystems;
-      public static Dictionary<long, NanobotBuildAndRepairSystemBlock> BuildAndRepairSystems
+      private static Dictionary<long, BARBlock> _BuildAndRepairSystems;
+      public static Dictionary<long, BARBlock> BuildAndRepairSystems
       {
          get
          {
-            return _BuildAndRepairSystems != null ? _BuildAndRepairSystems : _BuildAndRepairSystems = new Dictionary<long, NanobotBuildAndRepairSystemBlock>();
+            return _BuildAndRepairSystems != null ? _BuildAndRepairSystems : _BuildAndRepairSystems = new Dictionary<long, BARBlock>();
          }
       }
 
@@ -189,7 +189,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
       public static void InitControls()
       {
          //Call also on dedicated else the properties for the scripting interface are not initialized
-         if (SettingsValid && !NanobotBuildAndRepairSystemTerminal.CustomControlsInit && BuildAndRepairSystems.Count > 0) NanobotBuildAndRepairSystemTerminal.InitializeControls();
+         if (SettingsValid && !BARTerminal.CustomControlsInit && BuildAndRepairSystems.Count > 0) BARTerminal.InitializeControls();
       }
 
       /// <summary>
@@ -602,7 +602,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
       /// <summary>
       /// 
       /// </summary>
-      public static void SyncBlockDataRequestSend(NanobotBuildAndRepairSystemBlock block)
+      public static void SyncBlockDataRequestSend(BARBlock block)
       {
          if (MyAPIGateway.Session.IsServer) return;
 
@@ -625,7 +625,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
 
          var msgRcv = MyAPIGateway.Utilities.SerializeFromBinary<MsgBlockDataRequest>(dataRcv);
 
-         NanobotBuildAndRepairSystemBlock system;
+         BARBlock system;
          if (BuildAndRepairSystems.TryGetValue(msgRcv.EntityId, out system))
          {
             if (Mod.Log.ShouldLog(Logging.Level.Communication)) Mod.Log.Write(Logging.Level.Communication, "BuildAndRepairSystemMod: SyncBlockDataRequestReceived SteamId={0} EntityId={1}/{2}", msgRcv.SteamId, msgRcv.EntityId, Logging.BlockName(system.Entity, Logging.BlockNameOptions.None));
@@ -641,7 +641,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
       /// <summary>
       /// 
       /// </summary>
-      public static void SyncBlockSettingsSend(ulong steamId, NanobotBuildAndRepairSystemBlock block)
+      public static void SyncBlockSettingsSend(ulong steamId, BARBlock block)
       {
 
          var msgSnd = new MsgBlockSettings();
@@ -679,7 +679,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
          {
             var msgRcv = MyAPIGateway.Utilities.SerializeFromBinary<MsgBlockSettings>(dataRcv);
 
-            NanobotBuildAndRepairSystemBlock system;
+            BARBlock system;
             if (BuildAndRepairSystems.TryGetValue(msgRcv.EntityId, out system))
             {
                if (Mod.Log.ShouldLog(Logging.Level.Communication)) Mod.Log.Write(Logging.Level.Communication, "BuildAndRepairSystemMod: SyncBlockSettingsReceived EntityId={0}/{1}", msgRcv.EntityId, Logging.BlockName(system.Entity, Logging.BlockNameOptions.None));
@@ -703,7 +703,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
       /// <summary>
       /// 
       /// </summary>
-      public static void SyncBlockStateSend(ulong steamId, NanobotBuildAndRepairSystemBlock system)
+      public static void SyncBlockStateSend(ulong steamId, BARBlock system)
       {
          if (!MyAPIGateway.Session.IsServer) return;
          if (!MyAPIGateway.Multiplayer.MultiplayerActive) return;
@@ -737,7 +737,7 @@ namespace SpaceEquipmentLtd.NanobotBuildAndRepairSystem
          {
             var msgRcv = MyAPIGateway.Utilities.SerializeFromBinary<MsgBlockState>(dataRcv);
 
-            NanobotBuildAndRepairSystemBlock system;
+            BARBlock system;
             if (BuildAndRepairSystems.TryGetValue(msgRcv.EntityId, out system))
             {
                if (Mod.Log.ShouldLog(Logging.Level.Communication)) Mod.Log.Write(Logging.Level.Communication, "BuildAndRepairSystemMod: SyncBlockStateReceived EntityId={0}/{1}, State={2}", system.Entity.EntityId, Logging.BlockName(system.Entity, Logging.BlockNameOptions.None), msgRcv.State.ToString());
