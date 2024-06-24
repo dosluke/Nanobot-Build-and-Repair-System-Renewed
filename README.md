@@ -1,3 +1,5 @@
+# It has come to my attention, that mod reposts on the steam workshop are prohibited without express consent of the original owner. Therefore this repo will serve to preserve the code with minimal changes. You can find the spiritual successor [here](https://github.com/dosluke/Celestial-Constructor).
+
 ![Nanobot Build and Repair System](thumb.jpg)
 
 This is an updated version of the Nanobot Build and Repair System for Space Engineers, designed to be much more friendly for servers while still working for single player worlds. Back-end enhancements will be prioritized over other features, as this is working to be efficient for servers.
