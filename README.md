@@ -20,3 +20,4 @@ This is an updated version of the Nanobot Build and Repair System for Space Engi
 + Checking for safezones/shields when grinding.
 + Add the Drill and Fill system, with similar tweaks for performance.
 + Maybe a player refill beam? heals the player and refills O2/H2 and energy.
++ Change the block base type to cut down on vanilla code running in the background, and only use custom super efficient.
