@@ -1,0 +1,56 @@
+/*Change log:
+*
+*
+* ============= NEW CHANGES WILL BE KEPT TRACK OF ON GITHUB =============
+*
+*
+* V 2.1.6:
+*     -Fix: Fixed issue with ResourceSink/Power after Heavy Industrie Update
+* V 2.1.5:
+*     -Fix: Edit priority list while multiple block are selected
+* V 2.1.4:
+*     -Fix: Reverted to 2.1.2
+* V 2.1.3:
+*     -Fix: Added internal TransportInventory to Block componentes list (ownership)
+* V 2.1.2:
+*     -New: Works now with API changes from public test
+* V 2.1.1:
+*     -New: Complete Russian translation thanks to Lexx Lord
+*     -New: Chat command to export a language file for easier translation
+*     -Fix: If Server version of the mod was older than client version some janitor functions were disabled
+* V 2.1.0:
+*     -New: Localization support
+*     -New: Setting to disable specific janitor functions (e.g. disable offence functions)
+* V 2.0.8:
+*     -Fix: Now working with economy update
+* V 2.0.7:
+*     -Fix: Creating of settings object to late
+*     -Fix: Update of CustomInfo in case of Enabled/IsWorking changed
+* V 2.0.6:
+*     -Fix: Now all changed settings inside settings file will also change settings of allready build blocks. (Has been at least not the case for power settings)
+* V 2.0.5:
+*     -New: Show current mod/settings folders in help screen.
+* V 2.0.4:
+*     -Fix: Assembler queuing now ignores assemblers in "Disassembly" mode
+* V 2.0.3:
+*     -New: Use new api function IsWithinWorldLimits / Build with buildByInfo
+*     -Fix: Priority IMyPowerProducer handled as PowerBlock
+*     -Fix: Priority Thrusters, Wheels, Motors handled as Thruster
+* V 2.0.2:
+*     -Fix: Ignore and Grind color not set correct in client/server communication
+* V 2.0.1:
+*     -Fix: Exception while mixed version of mod (incompatible ProtoMember numbering)
+* V 2.0.0:
+*     -Changed: Rearranged GUI Controls, new grouping
+*     -Changed: command format from /xx to -xx e.g. /nanobars /cwsf -> /nanobars -cwsf
+*     -New: Weld option "Weld to functional only"
+*           Area Offset (Changed AreaWidthLeft/Right,AreaWidthTop/Bottom, AreaWidthFront/Rear to AreaWidth, AreaHeight, AreaDepth and add Horizontal offset, Vertical offset, Forward offset)
+*           Detailed GUI Info in case of not working block (switched off, damaged/incomplete, not enought power)
+*           Model added orientation indicators (left, right, front, back, down)
+*     -New Settings: 
+*        MaxBackgroundTasks
+*        MaximumOffset
+*        MaximumRequiredElectricPowerStandby
+*        AllowedEffects (WeldingVisualEffect WeldingSoundEffect GrindingVisualEffect GrindingSoundEffect TransportVisualEffect)
+*     -Fix: Ignore/Grind Color not allways found equal to block color (as Keen converted color to uint and back to float loosing significant precision)
+*/
