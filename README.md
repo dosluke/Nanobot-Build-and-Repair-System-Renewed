@@ -1,7 +1,9 @@
-This is an updated version of the Nanobot Build and Repair System for Space Engineers, designed to be much more friendly for servers while still achieving feature parity and complete compatibility with local worlds. Back-end enhancements will be prioritized over new features.
+![Nanobot Build and Repair System](thumb.jpg)
+
+This is an updated version of the Nanobot Build and Repair System for Space Engineers, designed to be much more friendly for servers while still working for single player worlds. Back-end enhancements will be prioritized over other features, as this is working to be efficient for servers.
 
 ## Current Changes:
-+ Gutted the Grinding/Welding VFX. They used the Interlock class for atomically setting variables which causes slowdowns as separate threads wait to modify the same variable.
++ Gutted the Grinding/Welding VFX. They used the Interlock class for atomically setting variables which causes slowdowns as separate threads wait to modify the same variable. Audio is relocated within the code and working as expected.
 
 ## Planned Efficiency Changes:
 + When a block needs to be placed, for example from a projection, and has not been placed yet, Paste the block in, instead of welding. This should decrease cpu cycles incurred by the mod separating placing and welding.
